@@ -5,16 +5,20 @@ using UnityEngine.AI;
 
 public class PlayerAI : MonoBehaviour
 {
+    [SerializeField] private Animator aniamtor;
+    
     Vector3 target;
     NavMeshAgent agent;
     
-    // Start is called before the first frame update
+    private static readonly int Running = Animator.StringToHash("Running");
+
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
     }
 
-    // Update is called once per frame
+    
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
@@ -25,5 +29,7 @@ public class PlayerAI : MonoBehaviour
                 agent.SetDestination(hit.point);
             }
         }
+        
+        aniamtor.SetBool(Running,agent.velocity.magnitude > 0);
     }
 }

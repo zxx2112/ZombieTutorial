@@ -6,6 +6,8 @@ using UnityEngine.AI;
 
 public class MyAI : MonoBehaviour
 {
+    [SerializeField] private LinePath path;
+    
     NavMeshAgent agent;
     Animator anim;
     public Transform target;
@@ -18,7 +20,13 @@ public class MyAI : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player");
         anim = GetComponent<Animator>();
         target = GameObject.FindGameObjectWithTag("Player").transform;
-        StartCoroutine(SetTarget());
+        
+        if(path == null)
+            StartCoroutine(SetTarget());
+        else
+        {
+            StartCoroutine(FollowPath());
+        }
     }
 
     private void Update()
@@ -40,5 +48,26 @@ public class MyAI : MonoBehaviour
         yield return new WaitForSeconds(1f);
         agent.SetDestination(target.position);
         StartCoroutine(SetTarget());
+    }
+
+    IEnumerator FollowPath()
+    {
+        yield return new WaitForSeconds(1f);
+
+        var param = path.GetParam(transform.position);
+        if (path.IsAtEndOfPath(transform.position, param, out var finalDestination))
+        {
+            agent.isStopped = true;
+        }
+        else
+        {
+            param += 1;
+            agent.isStopped = false;
+            var position = path.GetPosition(param);
+            agent.SetDestination(position);
+        }
+
+        StartCoroutine(FollowPath());
+
     }
 }
