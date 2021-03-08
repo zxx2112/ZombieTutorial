@@ -17,6 +17,10 @@ public class MyAI : MonoBehaviour
     
     [SerializeField] private LinePath path;
     
+    [SerializeField] private Transform[] nodeTransforms;
+    [SerializeField] private UnitPath path;
+    [SerializeField] private float step;
+
     NavMeshAgent agent;
     Animator anim;
     public Transform target;
@@ -26,7 +30,7 @@ public class MyAI : MonoBehaviour
     private Stopwatch _pathFindCooldown;
     private Stopwatch _attackTimer;
 
-    // Start is called before the first frame update
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -38,6 +42,13 @@ public class MyAI : MonoBehaviour
         _pathFindCooldown.Start();
 
         _attackTimer = new Stopwatch();
+
+        var nodes = new Vector3[nodeTransforms.Length];
+        for (int i = 0; i < nodes.Length; i++)
+        {
+            nodes[i] = nodeTransforms[i].position;
+        }
+        path.Init(nodes);
     }
 
     private void Update()
@@ -108,14 +119,24 @@ public class MyAI : MonoBehaviour
         var param = path.GetParam(transform.position);
         if (path.IsAtEndOfPath(transform.position, param, out var finalDestination))
         {
-            agent.isStopped = true;
+            path.Reverse();
         }
         else
         {
-            param += 1;
+            param += step;
             agent.isStopped = false;
             var position = path.GetPosition(param);
             agent.SetDestination(position);
+        }
+    }
+    
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        
+        for (int i = 0; i < nodeTransforms.Length - 1; i++)
+        {
+            Gizmos.DrawLine(nodeTransforms[i].position,nodeTransforms[i+1].position);
         }
     }
 }

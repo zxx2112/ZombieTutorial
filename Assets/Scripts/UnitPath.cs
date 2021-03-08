@@ -1,27 +1,27 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.NetworkInformation;
-using UnityEditor;
 using UnityEngine;
 
-public class LinePath : MonoBehaviour
+public class UnitPath : MonoBehaviour
 {
-    [SerializeField] private Transform[] nodes;
     [SerializeField] float stopRadius = 0.005f;
 
-    
+    private Vector3[] nodes;
     private float[] distances;
     private float maxDist;
 
-    private void Start()
+    public void Init(Vector3[] pathNodes)
     {
+        nodes = new Vector3[pathNodes.Length];
+        for (int i = 0; i < nodes.Length; i++)
+        {
+            nodes[i] = pathNodes[i];
+        }
+        
         distances = new float[nodes.Length];
         distances[0] = 0;
         for (int i = 0; i < nodes.Length - 1; i++)
         {
-            distances[i + 1] = distances[i] + Vector3.Distance(nodes[i].position, nodes[i + 1].position);
+            distances[i + 1] = distances[i] + Vector3.Distance(nodes[i], nodes[i + 1]);
         }
 
         maxDist = distances[distances.Length - 1];
@@ -30,7 +30,7 @@ public class LinePath : MonoBehaviour
     public float GetParam(Vector3 position)
     {
         var closestSegment = GetClosestSegment(position);
-        var param = this.distances[closestSegment] + GetParamForSegment(position,nodes[closestSegment].position,nodes[closestSegment+1].position);
+        var param = this.distances[closestSegment] + GetParamForSegment(position,nodes[closestSegment],nodes[closestSegment+1]);
         return param;
     }
 
@@ -38,11 +38,12 @@ public class LinePath : MonoBehaviour
     {
         bool result;
 
-        finalDestination = nodes[nodes.Length - 1].position;
+        finalDestination = nodes[nodes.Length - 1];
 
         if (param >= this.distances[nodes.Length - 2])
         {
-            result = Vector3.Distance(position, finalDestination) < stopRadius;
+            var distance = Vector3.Distance(position, finalDestination); 
+            result =  distance< stopRadius;
         }
         else
         {
@@ -83,20 +84,24 @@ public class LinePath : MonoBehaviour
             i -= 1;
         }
 
-        float t = (param - distances[i]) / Vector3.Distance(nodes[i].position, nodes[i + 1].position);
+        float t = (param - distances[i]) / Vector3.Distance(nodes[i], nodes[i + 1]);
 
-        return Vector3.Lerp(nodes[i].position, nodes[i + 1].position, t);
+        return Vector3.Lerp(nodes[i], nodes[i + 1], t);
     }
-    
+
+    public void Reverse()
+    {
+        Array.Reverse(nodes);
+    }
     
     private int GetClosestSegment(Vector3 position)
     {
-        var closestDist = DistToSegment(position,nodes[0].position,nodes[1].position);
+        var closestDist = DistToSegment(position,nodes[0],nodes[1]);
         var closestSegment = 0;
 
         for (int i = 1; i < nodes.Length - 1; i++)
         {
-            float dist = DistToSegment(position, nodes[i].position, nodes[i + 1].position);
+            float dist = DistToSegment(position, nodes[i], nodes[i + 1]);
             if (dist < closestDist)
             {
                 closestDist = dist;
@@ -178,15 +183,5 @@ public class LinePath : MonoBehaviour
 
         Vector3 closestPoint = Vector3.Lerp(v, w, t);
         return Vector3.Distance(p, closestPoint);
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.green;
-        
-        for (int i = 0; i < nodes.Length - 1; i++)
-        {
-            Gizmos.DrawLine(nodes[i].position,nodes[i+1].position);
-        }
     }
 }

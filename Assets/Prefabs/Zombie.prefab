@@ -3091,6 +3091,7 @@ GameObject:
   - component: {fileID: 8459855244623397959}
   - component: {fileID: 8459855244623397960}
   - component: {fileID: 599253871375498857}
+  - component: {fileID: 3748601238807569468}
   m_Layer: 0
   m_Name: Zombie
   m_TagString: Untagged
@@ -3134,6 +3135,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af4dcd7e22a4f434aaaec9d6075dafa5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  nodeTransforms: []
+  path: {fileID: 3748601238807569468}
   target: {fileID: 0}
 --- !u!195 &8459855244623397960
 NavMeshAgent:
@@ -3176,6 +3179,19 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &3748601238807569468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8459855244623397954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b665e62c713efd445bc2eed7c0b7936a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stopRadius: 0.005
 --- !u!1 &8543186860734376501
 GameObject:
   m_ObjectHideFlags: 0
