@@ -30,6 +30,6 @@ public class PlayerAI : MonoBehaviour
             }
         }
         
-        aniamtor.SetBool(Running,agent.velocity.magnitude > 0);
+        aniamtor.SetBool(Running,agent.velocity.magnitude > 0.5f);
     }
 }
