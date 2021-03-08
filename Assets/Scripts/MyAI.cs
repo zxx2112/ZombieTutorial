@@ -6,20 +6,28 @@ using UnityEngine.AI;
 
 public class MyAI : MonoBehaviour
 {
-    [SerializeField] private LinePath path;
-    
+    [SerializeField] private Transform[] nodeTransforms;
+    [SerializeField] private UnitPath path;
+    [SerializeField] private float step;
+
     NavMeshAgent agent;
     Animator anim;
     public Transform target;
     GameObject player;
 
-    // Start is called before the first frame update
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         player = GameObject.FindGameObjectWithTag("Player");
         anim = GetComponent<Animator>();
         target = GameObject.FindGameObjectWithTag("Player").transform;
+
+        var nodes = new Vector3[nodeTransforms.Length];
+        for (int i = 0; i < nodes.Length; i++)
+        {
+            nodes[i] = nodeTransforms[i].position;
+        }
+        path.Init(nodes);
         
         if(path == null)
             StartCoroutine(SetTarget());
@@ -57,11 +65,11 @@ public class MyAI : MonoBehaviour
         var param = path.GetParam(transform.position);
         if (path.IsAtEndOfPath(transform.position, param, out var finalDestination))
         {
-            agent.isStopped = true;
+            path.Reverse();
         }
         else
         {
-            param += 1;
+            param += step;
             agent.isStopped = false;
             var position = path.GetPosition(param);
             agent.SetDestination(position);
@@ -69,5 +77,15 @@ public class MyAI : MonoBehaviour
 
         StartCoroutine(FollowPath());
 
+    }
+    
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        
+        for (int i = 0; i < nodeTransforms.Length - 1; i++)
+        {
+            Gizmos.DrawLine(nodeTransforms[i].position,nodeTransforms[i+1].position);
+        }
     }
 }
